@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hermezon-config
+  labels:
+    app: hermezon
+data:
+  HERMEZON_MAX_RETRIES: "3"
+  HERMEZON_RETRY_SECONDS: "2"
+  HERMEZON_VERBOSE: "true"
+  HERMEZON_LISTEN_PORT: "8080"
+  HERMEZON_AVAILABILITY_SCHEDULE_FREQUENCY: 5s
+  HERMEZON_PRICE_SCHEDULE_FREQUENCY: 1h
+  HERMEZON_DB_FILE_PATH: /var/lib/hermezon/hermezon.db
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hermezon-storage
+  labels:
+    app: hermezon
+    layer: api
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  resources:
+    requests:
+      storage: 300Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hermezon
+  labels:
+    app: hermezon
+    layer: api
+spec:
+  selector:
+    app: hermezon
+    layer: api
+    canary: blue
+  type: ClusterIP
+  ports:
+    - name: https
+      port: 443
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hermezon
+  labels:
+    app: hermezon
+    layer: api
+    canary: blue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hermezon
+      layer: api
+      canary: blue
+  template:
+    metadata:
+      labels:
+        app: hermezon
+        layer: api
+        canary: blue
+    spec:
+      containers:
+        - name: hermezon
+          image: ivaquero/hermezon:0.1.0-SNAPSHOT
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: hermezon-config
+            - secretRef:
+                name: hermezon-secret
+          volumeMounts:
+            - name: hermezon-db
+              mountPath: /var/lib/hermezon
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+      volumes:
+        - name: hermezon-db
+          persistentVolumeClaim:
+            claimName: hermezon-storage
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hermezon-ingress
+  labels:
+    app: hermezon
+    layer: api
+  annotations:
+    cert-manager.io/cluster-issuer: certificates-issuer
+spec:
+  rules:
+    - host: hermezon.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hermezon
+                port:
+                  name: https
+  tls:
+    - hosts:
+        - hermezon.com
+      secretName: hermezon-tls
