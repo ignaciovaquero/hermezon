@@ -6,7 +6,6 @@ import (
 
 	"github.com/igvaquero18/hermezon/scraper"
 	"github.com/labstack/echo/v4"
-	bolt "go.etcd.io/bbolt"
 )
 
 // Action is the action we will perform for tracking
@@ -80,16 +79,5 @@ func postActions(c echo.Context) error {
 		"price", action.Price,
 	)
 
-	err := db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(action.Type))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err.Error())
-		}
-		return b.Put([]byte(fmt.Sprintf("%s|%s", action.Phone, action.URL)), []byte(secondParameter))
-	})
-
-	if err != nil {
-		return fmt.Errorf("transaction error: %s", err.Error())
-	}
-	return nil
+	return db.Save(fmt.Sprintf("%s|%s", action.Phone, action.URL), secondParameter, string(action.Type))
 }

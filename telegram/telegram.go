@@ -11,8 +11,8 @@ type Client struct {
 	*telegram.Client
 }
 
-// NewClient returns a Client. A valid Telegram token and implementation of
-// the Logger interface must be provided
+// NewClient returns a Client. A valid Telegram token must be provided.
+// If logger is nil, a logger with basic capabilities will be used instead.
 func NewClient(telegramToken string, logger Logger) (*Client, error) {
 	if logger == nil {
 		logger = &defaultLogger{}
