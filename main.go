@@ -6,16 +6,15 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/bamzi/jobrunner"
+	"github.com/igvaquero18/hermezon/boltdb"
 	"github.com/igvaquero18/hermezon/scraper"
 	"github.com/igvaquero18/hermezon/telegram"
 	"github.com/igvaquero18/hermezon/twilio"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	bolt "go.etcd.io/bbolt"
 	"go.uber.org/zap"
 )
 
@@ -55,7 +54,7 @@ var (
 	messenger             *Messenger
 	e                     *echo.Echo
 	p                     *prometheus.Prometheus
-	db                    *bolt.DB
+	db                    KeyValueStorage
 	messagingClient       Messenger
 )
 
@@ -164,7 +163,7 @@ func main() {
 	var err error
 
 	// Setting up the database
-	db, err = bolt.Open(databaseFilePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err = boltdb.NewClient(databaseFilePath, sugar)
 	if err != nil {
 		sugar.Fatalw("error when opening the database", "msg", err.Error())
 	}
