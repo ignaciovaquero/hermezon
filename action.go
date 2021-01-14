@@ -11,7 +11,7 @@ import (
 // Action is the action we will perform for tracking
 // products
 type Action struct {
-	Phone       string     `json:"from"`
+	From        string     `json:"from"`
 	URL         string     `json:"url"`
 	Type        ActionType `json:"type"`
 	Price       string     `json:"price,omitempty"`
@@ -72,12 +72,12 @@ func postActions(c echo.Context) error {
 
 	sugar.Debugw("adding product to database",
 		"action", action.Type,
-		"phone", action.Phone,
+		"from", action.From,
 		"url", action.URL,
 		"selector", action.Selector,
 		"sold_out_text", action.SoldOutText,
 		"price", action.Price,
 	)
 
-	return db.Save(fmt.Sprintf("%s|%s", action.Phone, action.URL), secondParameter, string(action.Type))
+	return db.Save(fmt.Sprintf("%s|%s", action.From, action.URL), secondParameter, string(action.Type))
 }

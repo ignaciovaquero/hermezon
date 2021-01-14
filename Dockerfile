@@ -16,7 +16,12 @@ FROM alpine:3.12.3
 LABEL org.opencontainers.image.authors "Ignacio Vaquero Guisasola <ivaqueroguisasola@gmail.com>" \
       org.opencontainers.image.version "${HERMEZON_VERSION}"
 
-COPY --from=builder /go/bin/hermezon /go/bin/hermezon
+RUN addgroup -S hermezon && \
+    adduser -S hermezon -G hermezon
+
+USER hermezon
+
+COPY --chown=hermezon:hermezon --from=builder /go/bin/hermezon /go/bin/hermezon
 
 EXPOSE ${HERMEZON_LISTEN_PORT}
 

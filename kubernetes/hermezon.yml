@@ -118,7 +118,7 @@ spec:
                 name: hermezon
                 port:
                   name: https
-  tls:
-    - hosts:
-        - hermezon.com
-      secretName: hermezon-tls
+  #tls:
+  #  - hosts:
+  #      - hermezon.com
+  #    secretName: hermezon-tls
