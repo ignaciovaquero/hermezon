@@ -19,7 +19,7 @@ LABEL org.opencontainers.image.authors "Ignacio Vaquero Guisasola <ivaqueroguisa
 RUN addgroup -S hermezon && \
     adduser -S hermezon -G hermezon
 
-USER hermezon
+USER hermezon:hermezon
 
 COPY --chown=hermezon:hermezon --from=builder /go/bin/hermezon /go/bin/hermezon
 

@@ -7,9 +7,9 @@ metadata:
 data:
   HERMEZON_MAX_RETRIES: "3"
   HERMEZON_RETRY_SECONDS: "2"
-  HERMEZON_VERBOSE: "true"
+  HERMEZON_VERBOSE: "false"
   HERMEZON_LISTEN_PORT: "8080"
-  HERMEZON_AVAILABILITY_SCHEDULE_FREQUENCY: 1m
+  HERMEZON_AVAILABILITY_SCHEDULE_FREQUENCY: 5s
   HERMEZON_PRICE_SCHEDULE_FREQUENCY: 1h
   HERMEZON_DB_FILE_PATH: /var/lib/hermezon/hermezon.db
 ---
@@ -42,8 +42,8 @@ spec:
     canary: blue
   type: ClusterIP
   ports:
-    - name: https
-      port: 443
+    - name: http
+      port: 80
       targetPort: http
       protocol: TCP
 ---
@@ -71,8 +71,7 @@ spec:
     spec:
       containers:
         - name: hermezon
-          image: ivaquero/hermezon:0.1.0-SNAPSHOT
-          imagePullPolicy: Always
+          image: ivaquero/hermezon:1.0.0
           envFrom:
             - configMapRef:
                 name: hermezon-config
@@ -117,8 +116,8 @@ spec:
               service:
                 name: hermezon
                 port:
-                  name: https
-  #tls:
-  #  - hosts:
-  #      - hermezon.com
-  #    secretName: hermezon-tls
+                  name: http
+  tls:
+   - hosts:
+       - hermezon.com
+     secretName: hermezon-tls

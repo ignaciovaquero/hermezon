@@ -57,7 +57,7 @@ func (p price) Run() {
 		go func() {
 			priceBelow, err := scr.IsPriceBelow()
 			if err != nil {
-				sugar.Errorw("error when checking price", "channel", channel, "msg", err.Error())
+				sugar.Errorw("error when checking price", "channel", channel, "url", url, "msg", err.Error())
 			}
 			if priceBelow {
 				sugar.Debugw("Price is below!", "channel", channel, "url", url, "desired_price", targetPriceStr)

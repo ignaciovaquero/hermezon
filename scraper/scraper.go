@@ -14,7 +14,7 @@ import (
 
 const (
 	// DefaultSelector is a default CSS selector for the Availability message
-	DefaultSelector = "#availability span"
+	DefaultSelector = "#availability"
 
 	// DefaultSoldOutText is the text to compare to check if the item is unavailable.
 	DefaultSoldOutText = "no disponible."
@@ -175,7 +175,7 @@ func (s Scraper) getTextInSelector() (string, error) {
 	}
 
 	text := doc.Find(s.selector).Text()
-	s.Debugw("found text", "text", text, "selector", s.selector)
+	s.Debugw("found text", "url", s.url, "text", text, "selector", s.selector)
 	return text, nil
 }
 
@@ -185,7 +185,7 @@ func (s Scraper) IsAvailable() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return strings.TrimSpace(strings.ToLower(s.soldOutText)) != strings.TrimSpace(strings.ToLower(text)), nil
+	return !strings.Contains(strings.TrimSpace(strings.ToLower(text)), strings.TrimSpace(strings.ToLower(s.soldOutText))), nil
 }
 
 // IsPriceBelow returns true if the price is below s.targetPrice

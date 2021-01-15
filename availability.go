@@ -49,7 +49,7 @@ func (a availability) Run() {
 		go func() {
 			productAvailable, err := scr.IsAvailable()
 			if err != nil {
-				sugar.Errorw("error when checking price", "channel", channel, "msg", err.Error())
+				sugar.Errorw("error when checking availability", "channel", channel, "url", url, "msg", err.Error())
 			}
 			if productAvailable {
 				sugar.Debugw("Product is available!", "channel", channel, "url", url)
