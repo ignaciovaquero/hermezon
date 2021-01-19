@@ -27,12 +27,12 @@ func (a availability) Run() {
 		channel := keys[0]
 		url := keys[1]
 		selector := values[0]
-		soldOutText := values[1]
+		findText := values[1]
 		sugar.Debugw("checking product availability for customer",
 			"channel", channel,
 			"url", url,
 			"selector", selector,
-			"sold_out_text", soldOutText,
+			"find_text", findText,
 		)
 
 		// Build the scraper
@@ -42,7 +42,7 @@ func (a availability) Run() {
 			scraper.SetMaxRetries(maxRetries),
 			scraper.SetRetrySeconds(retrySeconds),
 			scraper.SetSelector(selector),
-			scraper.SetSoldOutText(soldOutText),
+			scraper.SetFindText(findText),
 			scraper.SetURL(url),
 		)
 
@@ -50,6 +50,7 @@ func (a availability) Run() {
 			productAvailable, err := scr.IsAvailable()
 			if err != nil {
 				sugar.Errorw("error when checking availability", "channel", channel, "url", url, "msg", err.Error())
+				return
 			}
 			if productAvailable {
 				sugar.Debugw("Product is available!", "channel", channel, "url", url)
