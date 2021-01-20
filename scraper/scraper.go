@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -16,8 +17,8 @@ const (
 	// DefaultSelector is a default CSS selector for the Availability message
 	DefaultSelector = "#availability"
 
-	// DefaultSoldOutText is the text to compare to check if the item is unavailable.
-	DefaultSoldOutText = "no disponible."
+	// DefaultFindText is the text to compare to check if the item is available.
+	DefaultFindText = "en stock."
 
 	// DefaultMaxRetries is the default number of max retries allowed.
 	DefaultMaxRetries int8 = 1
@@ -28,7 +29,7 @@ const (
 	// DefaultTargetPrice is the default target price.
 	DefaultTargetPrice float64 = 0
 
-	userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15"
+	userAgent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0"
 )
 
 // Scraper is a struct that contains all the details for performing scraping of a store
@@ -38,7 +39,7 @@ type Scraper struct {
 	expectedStatusCode int
 	targetPrice        float64
 	selector           string
-	soldOutText        string
+	findText           string
 	maxRetries         int8
 	retrySeconds       int8
 	Logger
@@ -54,7 +55,7 @@ func NewScraper(opts ...Option) *Scraper {
 		expectedStatusCode: http.StatusOK,
 		targetPrice:        DefaultTargetPrice,
 		selector:           DefaultSelector,
-		soldOutText:        DefaultSoldOutText,
+		findText:           DefaultFindText,
 		maxRetries:         DefaultMaxRetries,
 		retrySeconds:       DefaultRetrySeconds,
 		Logger:             new(defaultLogger),
@@ -101,12 +102,12 @@ func SetSelector(selector string) Option {
 	}
 }
 
-// SetSoldOutText Sets the text to compare
-func SetSoldOutText(soldOutText string) Option {
+// SetFindText Sets the text to compare
+func SetFindText(findText string) Option {
 	return func(s *Scraper) Option {
-		prev := s.soldOutText
-		s.soldOutText = soldOutText
-		return SetSoldOutText(prev)
+		prev := s.findText
+		s.findText = findText
+		return SetFindText(prev)
 	}
 }
 
@@ -161,6 +162,16 @@ func (s Scraper) getTextInSelector() (string, error) {
 	}
 
 	if resp.StatusCode != s.expectedStatusCode {
+		body, _ := ioutil.ReadAll(resp.Body)
+		s.Debugw(
+			"error when accessing store.",
+			"url", s.url,
+			"selector", s.selector,
+			"find_text", s.findText,
+			"response_status_code", resp.StatusCode,
+			"expected_status_code", s.expectedStatusCode,
+			"response_body", string(body),
+		)
 		return "", fmt.Errorf("response status code: %d, expected: %d", resp.StatusCode, s.expectedStatusCode)
 	}
 
@@ -185,7 +196,7 @@ func (s Scraper) IsAvailable() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return !strings.Contains(strings.TrimSpace(strings.ToLower(text)), strings.TrimSpace(strings.ToLower(s.soldOutText))), nil
+	return strings.Contains(strings.TrimSpace(strings.ToLower(text)), strings.TrimSpace(strings.ToLower(s.findText))), nil
 }
 
 // IsPriceBelow returns true if the price is below s.targetPrice

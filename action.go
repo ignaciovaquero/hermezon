@@ -11,19 +11,19 @@ import (
 // Action is the action we will perform for tracking
 // products
 type Action struct {
-	From        string     `json:"from"`
-	URL         string     `json:"url"`
-	Type        ActionType `json:"type"`
-	Price       string     `json:"price,omitempty"`
-	SoldOutText string     `json:"sold_out_text,omitempty"`
-	Selector    string     `json:"selector,omitempty"`
+	From     string     `json:"from"`
+	URL      string     `json:"url"`
+	Type     ActionType `json:"type"`
+	Price    string     `json:"price,omitempty"`
+	FindText string     `json:"find_text,omitempty"`
+	Selector string     `json:"selector,omitempty"`
 }
 
 // NewAction returns a new Action object with default values
 func NewAction() *Action {
 	return &Action{
-		SoldOutText: scraper.DefaultSoldOutText,
-		Selector:    scraper.DefaultSelector,
+		FindText: scraper.DefaultFindText,
+		Selector: scraper.DefaultSelector,
 	}
 }
 
@@ -67,7 +67,7 @@ func postActions(c echo.Context) error {
 	case priceAction:
 		secondParameter = fmt.Sprintf("%s|%s", action.Selector, action.Price)
 	default:
-		secondParameter = fmt.Sprintf("%s|%s", action.Selector, action.SoldOutText)
+		secondParameter = fmt.Sprintf("%s|%s", action.Selector, action.FindText)
 	}
 
 	sugar.Debugw("adding product to database",
@@ -75,7 +75,7 @@ func postActions(c echo.Context) error {
 		"from", action.From,
 		"url", action.URL,
 		"selector", action.Selector,
-		"sold_out_text", action.SoldOutText,
+		"find_text", action.FindText,
 		"price", action.Price,
 	)
 
