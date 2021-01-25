@@ -19,16 +19,14 @@ type Logger interface {
 	Infow(string, ...interface{})
 }
 
-type defaultLogger struct {
-	*log.Logger
-}
+type defaultLogger struct{}
 
 func (d *defaultLogger) Debug(v ...interface{}) {
-	d.Logger.Print(v...)
+	log.Print(v...)
 }
 
 func (d *defaultLogger) Debugf(format string, v ...interface{}) {
-	d.Logger.Printf(format, v...)
+	log.Printf(format, v...)
 }
 
 func (d *defaultLogger) Debugw(base string, keysAndValues ...interface{}) {
@@ -42,11 +40,11 @@ func (d *defaultLogger) Debugw(base string, keysAndValues ...interface{}) {
 }
 
 func (d *defaultLogger) Error(v ...interface{}) {
-	d.Logger.Print(v...)
+	log.Print(v...)
 }
 
 func (d *defaultLogger) Errorf(format string, v ...interface{}) {
-	d.Logger.Printf(format, v...)
+	log.Printf(format, v...)
 }
 
 func (d *defaultLogger) Errorw(base string, keysAndValues ...interface{}) {
@@ -54,11 +52,11 @@ func (d *defaultLogger) Errorw(base string, keysAndValues ...interface{}) {
 }
 
 func (d *defaultLogger) Info(v ...interface{}) {
-	d.Logger.Print(v...)
+	log.Print(v...)
 }
 
 func (d *defaultLogger) Infof(format string, v ...interface{}) {
-	d.Logger.Printf(format, v...)
+	log.Printf(format, v...)
 }
 
 func (d *defaultLogger) Infow(base string, keysAndValues ...interface{}) {
