@@ -437,4 +437,247 @@ func TestIsAvailable(t *testing.T) {
 			}
 		})
 	}
+
+}
+
+func TestIsPriceBelow(t *testing.T) {
+	testCases := []struct {
+		name     string
+		scr      *Scraper
+		err      error
+		expected bool
+	}{
+		{
+			name: "no errors and price in euros with commas is below",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">99,5€</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: true,
+			err:      nil,
+		},
+		{
+			name: "no errors and price in euros with dots is below",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">99.5  €</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: true,
+			err:      nil,
+		},
+		{
+			name: "no errors and price in euros with commas is above",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">995,10 €</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: false,
+			err:      nil,
+		},
+		{
+			name: "no errors and price in euros with dots is above",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">995.10   €  </div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: false,
+			err:      nil,
+		},
+		{
+			name: "no errors and price is not found",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="text">99,5€</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: false,
+			err:      fmt.Errorf("no price matched"),
+		},
+		{
+			name: "no errors and price in dollars with commas is below",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">$99,5</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: true,
+			err:      nil,
+		},
+		{
+			name: "no errors and price in pounds with dots is above",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">£  995.10</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: false,
+			err:      nil,
+		},
+		{
+			name: "no errors and trailing comma",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">£  99,</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: true,
+			err:      nil,
+		},
+		{
+			name: "no errors and leading comma",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">£  ,99</div>`)),
+						Header:     make(http.Header),
+					}, nil
+				}),
+			},
+			expected: true,
+			err:      nil,
+		},
+		{
+			name: "errors when getting text in selector",
+			scr: &Scraper{
+				url:                "https://test.com",
+				expectedStatusCode: http.StatusOK,
+				targetPrice:        100.5,
+				selector:           ".test",
+				findText:           "something",
+				maxRetries:         DefaultMaxRetries,
+				retrySeconds:       DefaultRetrySeconds,
+				Logger:             new(defaultLogger),
+				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(bytes.NewBufferString(`<div class="test">99,5 €</div>`)),
+						Header:     make(http.Header),
+					}, fmt.Errorf("an error")
+				}),
+			},
+			expected: false,
+			err:      fmt.Errorf("an error"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(tt *testing.T) {
+			actual, err := tc.scr.IsPriceBelow()
+			if tc.err != nil {
+				assert.Error(tt, err)
+			} else {
+				assert.NoError(tt, err)
+				assert.Equal(tt, tc.expected, actual)
+			}
+		})
+	}
 }
