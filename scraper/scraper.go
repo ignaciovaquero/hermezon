@@ -42,6 +42,7 @@ type Scraper struct {
 	findText           string
 	maxRetries         int8
 	retrySeconds       int8
+	client             *http.Client
 	Logger
 }
 
@@ -59,6 +60,7 @@ func NewScraper(opts ...Option) *Scraper {
 		maxRetries:         DefaultMaxRetries,
 		retrySeconds:       DefaultRetrySeconds,
 		Logger:             new(defaultLogger),
+		client:             new(http.Client),
 	}
 	for _, opt := range opts {
 		opt(m)
@@ -142,19 +144,18 @@ func SetTargetPrice(target float64) Option {
 
 func (s Scraper) getTextInSelector() (string, error) {
 	var retries int8 = 0
-	client := new(http.Client)
 	req, err := http.NewRequest(http.MethodGet, s.url, nil)
 	if err != nil {
 		return "", fmt.Errorf("error building the request: %x", err.Error())
 	}
 	req.Header.Set("User-Agent", userAgent)
-	resp, err := client.Do(req)
-	for (err != nil || resp.StatusCode != s.expectedStatusCode) && retries <= s.maxRetries {
+	resp, err := s.client.Do(req)
+	for (err != nil || resp.StatusCode != s.expectedStatusCode) && retries < s.maxRetries {
 		retries++
 		s.Debug("temporary error when accessing store. retrying...")
 		seconds, _ := time.ParseDuration(fmt.Sprintf("%ds", s.retrySeconds))
 		time.Sleep(seconds)
-		resp, err = client.Do(req)
+		resp, err = s.client.Do(req)
 	}
 
 	if err != nil {
