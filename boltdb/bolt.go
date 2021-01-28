@@ -3,36 +3,22 @@ package boltdb
 import (
 	"time"
 
+	"github.com/igvaquero18/hermezon/utils"
 	"github.com/pkg/errors"
 	bolt "go.etcd.io/bbolt"
 )
-
-// KeyValueStorage is an interface for abstracting away the key-value storage layer
-// from the application itself.
-type KeyValueStorage interface {
-	// Save saves a key-value pair to the database, at a particular bucket
-	Save(key, value, bucket string) error
-	// Delete deletes an object by Key
-	Delete(key, bucket string) error
-	// Get gets a value from a key
-	Get(key, bucket string) (string, error)
-	// GetAll gets all values, returning them in an array of strings
-	GetAll(bucket string) (map[string]string, error)
-	// Close closes the database
-	Close() error
-}
 
 // Client is a client that interacts with bolt. It implements the
 // KeyValueStorage interface
 type Client struct {
 	*bolt.DB
-	Logger
+	utils.Logger
 }
 
 // NewClient creates a new bolt Client. A path to a database must be passed in.
-func NewClient(databasePath string, log Logger) (*Client, error) {
+func NewClient(databasePath string, log utils.Logger) (*Client, error) {
 	if log == nil {
-		log = &defaultLogger{}
+		log = &utils.DefaultLogger{}
 	}
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
