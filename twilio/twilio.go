@@ -3,14 +3,20 @@ package twilio
 import (
 	"fmt"
 
+	"github.com/igvaquero18/hermezon/utils"
 	"github.com/sfreiberg/gotwilio"
 )
+
+// Notifier is an interface for sending SMS Messages
+type Notifier interface {
+	SendSMS(from, to, body, statusCallback, applicationSid string, opts ...*gotwilio.Option) (smsResponse *gotwilio.SmsResponse, exception *gotwilio.Exception, err error)
+}
 
 // Client is a struct that implicitly implements the Messenger interface
 // for sending messages throught Twilio
 type Client struct {
-	gotwilio.Twilio
-	Logger
+	Notifier
+	utils.Logger
 }
 
 // Option is a function to apply settings to Client structure
@@ -21,8 +27,8 @@ type Option func(c *Client) Option
 func NewClient(accountSid, authToken string, opts ...Option) *Client {
 	twilio := gotwilio.NewTwilioClient(accountSid, authToken)
 	c := &Client{
-		Twilio: *twilio,
-		Logger: &defaultLogger{},
+		Notifier: twilio,
+		Logger:   &utils.DefaultLogger{},
 	}
 	for _, opt := range opts {
 		opt(c)
@@ -31,7 +37,7 @@ func NewClient(accountSid, authToken string, opts ...Option) *Client {
 }
 
 // SetLogger Sets the Logger for Scraper
-func SetLogger(logger Logger) Option {
+func SetLogger(logger utils.Logger) Option {
 	return func(c *Client) Option {
 		prev := c.Logger
 		c.Logger = logger
