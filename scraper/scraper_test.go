@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/igvaquero18/hermezon/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +28,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -42,7 +43,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -57,7 +58,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -72,7 +73,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -87,7 +88,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           "text",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -102,7 +103,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         20,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -117,13 +118,13 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       30,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
 		{
 			name:    "Custom Logger",
-			options: []Option{SetLogger(new(defaultLogger))},
+			options: []Option{SetLogger(&utils.DefaultLogger{})},
 			expected: &Scraper{
 				url:                "",
 				expectedStatusCode: http.StatusOK,
@@ -132,7 +133,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -147,7 +148,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -156,13 +157,13 @@ func TestNewScraper(t *testing.T) {
 			options: []Option{
 				SetURL("https://myurl.com"),
 				SetTargetPrice(10),
-				SetLogger(new(defaultLogger)),
+				SetLogger(&utils.DefaultLogger{}),
 				SetExpectedStatusCode(201),
 				SetFindText("text"),
 				SetSelector(".available"),
 				SetMaxRetries(20),
 				SetRetrySeconds(30),
-				SetLogger(new(defaultLogger)),
+				SetLogger(&utils.DefaultLogger{}),
 			},
 			expected: &Scraper{
 				url:                "https://myurl.com",
@@ -172,7 +173,7 @@ func TestNewScraper(t *testing.T) {
 				findText:           "text",
 				maxRetries:         20,
 				retrySeconds:       30,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client:             new(http.Client),
 			},
 		},
@@ -214,7 +215,7 @@ func TestGetTextInSelector(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -236,7 +237,7 @@ func TestGetTextInSelector(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -258,7 +259,7 @@ func TestGetTextInSelector(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -280,7 +281,7 @@ func TestGetTextInSelector(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -302,7 +303,7 @@ func TestGetTextInSelector(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         1,
 				retrySeconds:       0,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -324,7 +325,7 @@ func TestGetTextInSelector(t *testing.T) {
 				findText:           DefaultFindText,
 				maxRetries:         1,
 				retrySeconds:       0,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -368,7 +369,7 @@ func TestIsAvailable(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -390,7 +391,7 @@ func TestIsAvailable(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -412,7 +413,7 @@ func TestIsAvailable(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -457,7 +458,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -479,7 +480,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -501,7 +502,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -523,7 +524,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -545,7 +546,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -567,7 +568,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -589,7 +590,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -611,7 +612,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -633,7 +634,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -655,7 +656,7 @@ func TestIsPriceBelow(t *testing.T) {
 				findText:           "something",
 				maxRetries:         DefaultMaxRetries,
 				retrySeconds:       DefaultRetrySeconds,
-				Logger:             new(defaultLogger),
+				Logger:             &utils.DefaultLogger{},
 				client: NewTestClient(func(req *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: http.StatusOK,

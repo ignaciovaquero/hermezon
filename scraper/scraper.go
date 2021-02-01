@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/igvaquero18/hermezon/utils"
 	"github.com/pkg/errors"
 )
 
@@ -43,7 +44,7 @@ type Scraper struct {
 	maxRetries         int8
 	retrySeconds       int8
 	client             *http.Client
-	Logger
+	utils.Logger
 }
 
 // Option is a function to apply settings to Scraper structure
@@ -59,7 +60,7 @@ func NewScraper(opts ...Option) *Scraper {
 		findText:           DefaultFindText,
 		maxRetries:         DefaultMaxRetries,
 		retrySeconds:       DefaultRetrySeconds,
-		Logger:             new(defaultLogger),
+		Logger:             &utils.DefaultLogger{},
 		client:             new(http.Client),
 	}
 	for _, opt := range opts {
@@ -78,7 +79,7 @@ func SetURL(url string) Option {
 }
 
 // SetLogger Sets the Logger for Scraper
-func SetLogger(logger Logger) Option {
+func SetLogger(logger utils.Logger) Option {
 	return func(s *Scraper) Option {
 		prev := s.Logger
 		s.Logger = logger

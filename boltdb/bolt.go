@@ -3,6 +3,7 @@ package boltdb
 import (
 	"time"
 
+	"github.com/igvaquero18/hermezon/utils"
 	"github.com/pkg/errors"
 	bolt "go.etcd.io/bbolt"
 )
@@ -11,13 +12,13 @@ import (
 // KeyValueStorage interface
 type Client struct {
 	*bolt.DB
-	Logger
+	utils.Logger
 }
 
 // NewClient creates a new bolt Client. A path to a database must be passed in.
-func NewClient(databasePath string, log Logger) (*Client, error) {
+func NewClient(databasePath string, log utils.Logger) (*Client, error) {
 	if log == nil {
-		log = &defaultLogger{}
+		log = &utils.DefaultLogger{}
 	}
 	db, err := bolt.Open(databasePath, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
