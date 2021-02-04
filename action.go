@@ -37,12 +37,12 @@ const (
 )
 
 // IsValid checks whether an action is valid or not
-func (at ActionType) IsValid() error {
+func (at ActionType) IsValid() bool {
 	switch at {
 	case priceAction, availabilityAction:
-		return nil
+		return true
 	}
-	return fmt.Errorf("invalid action type: %s", at)
+	return false
 }
 
 // ResponseMessage is a struct for building responses
@@ -57,8 +57,8 @@ func postActions(c echo.Context) error {
 	if err := c.Bind(&action); err != nil {
 		return c.JSON(http.StatusBadRequest, &ResponseMessage{fmt.Sprintf("invalid action: %s", err.Error())})
 	}
-	if err := action.Type.IsValid(); err != nil {
-		return c.JSON(http.StatusBadRequest, &ResponseMessage{err.Error()})
+	if action.Type.IsValid() {
+		return c.JSON(http.StatusBadRequest, &ResponseMessage{"invalid action"})
 	}
 
 	var secondParameter string
